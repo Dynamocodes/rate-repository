@@ -4,11 +4,12 @@ const theme = {
     textSecondary: '#586069',
     primary: '#0366d6',
     highContrast: '#ffffff',
+    textError: '#d73a4a'
   },
   backgroundColors:{
     dark:"#24292e",
     backgroundSecondary: '#e1e4e8',
-    backgroundPrimary: '#ffffff'   
+    backgroundPrimary: '#ffffff'  
   },
   fontSizes: {
     body: 14,
