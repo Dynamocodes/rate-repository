@@ -1,9 +1,7 @@
 import { View, Image, StyleSheet} from 'react-native'
 import Text from './Text'
 import theme from '../theme';
-
 const RepositoryItem = ({item}) => {
-
   const styles = StyleSheet.create({
     topContainer:{
       flexDirection: 'row',
@@ -13,6 +11,7 @@ const RepositoryItem = ({item}) => {
     },
     topRightContainer:{
       padding: 5,
+      flexShrink: 1,
     },
     bottomContainer:{
       display: 'flex',
@@ -48,16 +47,15 @@ const RepositoryItem = ({item}) => {
       height: 58,
     },
   });
-
   const formatAmount = (num) => {
     if(num >= 1000){
       return `${Math.round((num/1000) * 10)/10}k`
     }
-    return `stars`
+    return num
   }
 
   return (
-    <View style={styles.mainContainer}>
+    <View testID="repositoryItem" style={styles.mainContainer}>
       <View style={styles.topContainer}>
         <View style={styles.topLeftContainer}>
           <Image
