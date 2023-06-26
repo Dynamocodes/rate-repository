@@ -3,6 +3,7 @@ import { Formik } from 'formik';
 import FormikTextInput from './FormikTextInput';
 import theme from '../theme';
 import Text from './Text';
+import useSignIn from '../hooks/useSignIn'
 
 import * as yup from 'yup';
 
@@ -21,7 +22,7 @@ const styles = StyleSheet.create({
   flexItems:{
     padding:15,
     margin: 5,
-
+    
   },
   button:{
     backgroundColor: theme.colors.primary,
@@ -33,10 +34,9 @@ const styles = StyleSheet.create({
     borderRadius:5,
     color: theme.colors.highContrast
   },
+
 })
-const signIn = (username, password) => {
-  return `${username} and ${password} are correct credentials, signed in!`
-};
+
 const SignInForm = ({ onSubmit }) => {
     return (
       <View style={styles.container}>
@@ -48,7 +48,6 @@ const SignInForm = ({ onSubmit }) => {
       </View>
     );
   };
-
   const validationSchema = yup.object().shape({
     username: yup
       .string()
@@ -59,11 +58,16 @@ const SignInForm = ({ onSubmit }) => {
   });
 
 const SignInPage = () => {
-  const onSubmit = values => {
-    const username = values.username
-    const password = values.password
-    if (username && password ) {
-      console.log(`sign in status: ${signIn(username, password)}`);
+  const [signIn] = useSignIn();
+
+  const onSubmit = async values => {
+    const { username, password } = values;
+
+    try {
+      const { data } = await signIn({ username, password });
+      console.log(data);
+    } catch (e) {
+      console.log(e);
     }
   };
 
@@ -76,6 +80,4 @@ const SignInPage = () => {
     </Formik>
   );
 };
-
-
 export default SignInPage;
