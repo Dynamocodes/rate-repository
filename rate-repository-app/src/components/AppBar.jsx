@@ -79,6 +79,16 @@ const CreateReviewTab = () => {
   return null
 }
 
+const SignUpTab = () => {
+  const resultMe = useQuery(ME);
+  const me = resultMe.loading ? undefined : resultMe.data.me
+
+  if(me && me.username){
+    return null
+  }
+  return <AppBarTab title="Sign Up" path="sign-up"/>
+}
+
 const AppBar = () => {
   return (
     <View style={styles.container}>
@@ -86,6 +96,7 @@ const AppBar = () => {
         <AppBarTab title="Repository" path="/"/>
         <CreateReviewTab/>
         <SignInTab/>
+        <SignUpTab/>
       </ScrollView>
     </View>
   );
