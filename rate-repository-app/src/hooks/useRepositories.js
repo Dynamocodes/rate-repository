@@ -1,7 +1,8 @@
 import { useQuery } from '@apollo/client';
 import { GET_REPOSITORIES } from '../graphql/queries';
+import { useDebounce } from 'use-debounce';
 
-const useRepositories = (selectedSort) => {
+const useRepositories = (selectedSort, searchTerm) => {
   let orderBy, orderDirection;
 
   switch (selectedSort) {
@@ -21,10 +22,10 @@ const useRepositories = (selectedSort) => {
       orderBy = 'CREATED_AT';
       orderDirection = 'DESC';
   }
-
+  const [debouncedSearchTerm] = useDebounce(searchTerm, 500);
   const allRepositories = useQuery(GET_REPOSITORIES, {
     fetchPolicy: 'cache-and-network',
-    variables: { orderBy, orderDirection }, // pass the variables to the query
+    variables: { orderBy, orderDirection, searchKeyword: debouncedSearchTerm }, // pass the variables to the query
   })
 
   const repositories = allRepositories.loading ? undefined : allRepositories.data.repositories

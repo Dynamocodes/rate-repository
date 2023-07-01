@@ -1,6 +1,6 @@
 import { FlatList, View, StyleSheet, Pressable } from 'react-native';
-import { useState } from 'react';
-import { Menu, Button } from 'react-native-paper';
+import React, { useState } from 'react';
+import { Menu, Button, Searchbar } from 'react-native-paper';
 import RepositoryItem from './RepositoryItem';
 import useRepositories from '../hooks/useRepositories';
 import { useNavigate } from 'react-router-native';
@@ -17,47 +17,62 @@ const styles = StyleSheet.create({
 
 const ItemSeparator = () => <View style={styles.separator} />;
 
-export const RepositoryListContainer = ({ repositories, onItemPress, selectedSort, setSelectedSort, visible, openMenu, closeMenu }) => {
-  const repositoryNodes = repositories
-    ? repositories.edges.map((edge) => edge.node)
-    : [];
+export class RepositoryListContainer extends React.Component {
+  renderItem = ({ item }) => {
+    return (
+      <Pressable onPress={() => this.props.onItemPress(item.id)}>
+        <RepositoryItem item={item} />
+      </Pressable>
+    );
+  };
 
-  const renderItem = ({ item }) => (
-    <Pressable onPress={() => onItemPress(item.id)}>
-      <RepositoryItem item={item} />
-    </Pressable>
-  );
-
-  return (
-    <FlatList
-      data={repositoryNodes}
-      ItemSeparatorComponent={ItemSeparator}
-      ListHeaderComponent={
+  renderHeader = () => {
+    return (
+      <View>
         <Menu
-          visible={visible}
-          onDismiss={closeMenu}
+          visible={this.props.isMenuVisible}
+          onDismiss={this.props.hideMenu}
           anchor={
-            <Button onPress={openMenu}>
-              {selectedSort === "latest" && "Latest repositories"}
-              {selectedSort === "highest" && "Highest rated repositories"}
-              {selectedSort === "lowest" && "Lowest rated repositories"}
+            <Button onPress={this.props.showMenu}>
+              {this.props.selectedSort === 'latest' && "Latest repositories"}
+              {this.props.selectedSort === 'highest' && "Highest rated repositories"}
+              {this.props.selectedSort === 'lowest' && "Lowest rated repositories"}
             </Button>
           }
         >
-          <Menu.Item onPress={() => {setSelectedSort("latest"); closeMenu();}} title="Latest repositories" />
-          <Menu.Item onPress={() => {setSelectedSort("highest"); closeMenu();}} title="Highest rated repositories" />
-          <Menu.Item onPress={() => {setSelectedSort("lowest"); closeMenu();}} title="Lowest rated repositories" />
+          <Menu.Item onPress={() => this.props.setSelectedSort('latest')} title="Latest repositories" />
+          <Menu.Item onPress={() => this.props.setSelectedSort('highest')} title="Highest rated repositories" />
+          <Menu.Item onPress={() => this.props.setSelectedSort('lowest')} title="Lowest rated repositories" />
         </Menu>
-      }
-      renderItem={renderItem}
-    />
-  );
-};
+        <Searchbar 
+          placeholder="Search..."
+          onChangeText={text => this.props.setSearchTerm(text)}
+          value={this.props.searchTerm}
+        />
+      </View>
+    );
+  };
 
+  render() {
+    const repositoryNodes = this.props.repositories
+      ? this.props.repositories.edges.map((edge) => edge.node)
+      : [];
+
+    return (
+      <FlatList
+        data={repositoryNodes}
+        ItemSeparatorComponent={ItemSeparator}
+        ListHeaderComponent={this.renderHeader}
+        renderItem={this.renderItem}
+      />
+    );
+  }
+}
 
 const RepositoryList = () => {
   const [selectedSort, setSelectedSort] = useState('latest');
-  const { repositories } = useRepositories(selectedSort);
+  const [searchTerm, setSearchTerm] = useState('');
+  const { repositories } = useRepositories(selectedSort, searchTerm);
   const navigate = useNavigate();
   const [visible, setVisible] = useState(false);
 
@@ -77,6 +92,8 @@ const RepositoryList = () => {
     visible={visible}
     openMenu={openMenu}
     closeMenu={closeMenu}
+    setSearchTerm={setSearchTerm}
+    searchTerm={searchTerm}
     />
   );
 };
